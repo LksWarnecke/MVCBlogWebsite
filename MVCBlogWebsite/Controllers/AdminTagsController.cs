@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MVCBlogWebsite.Data;
 using MVCBlogWebsite.Models.Domain;
@@ -7,6 +8,7 @@ using MVCBlogWebsite.Repositories;
 
 namespace MVCBlogWebsite.Controllers
 {
+	[Authorize(Roles = "Admin")]
 	public class AdminTagsController : Controller
 	{
 		private readonly ITagRepository _tagRepository;
@@ -15,7 +17,6 @@ namespace MVCBlogWebsite.Controllers
         {
 			_tagRepository = tagRepository;
 		}
-
 
         [HttpGet]
 		public IActionResult Add()

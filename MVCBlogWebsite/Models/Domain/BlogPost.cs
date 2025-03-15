@@ -12,6 +12,10 @@
         public DateTime PublishedDate { get; set; }
         public string Author { get; set; }
         public bool Visible { get; set; }
+
+        //Navigation properties
         public ICollection<Tag> Tags { get; set; } // collection of Tag.cs //many to many relationship -> BlogPost can have many Tags
-	}
-}
+	
+        public ICollection<BlogPostLike> Like {  get; set; } 
+    }
+}  

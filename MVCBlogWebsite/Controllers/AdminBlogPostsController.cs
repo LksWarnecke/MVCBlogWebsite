@@ -3,10 +3,12 @@ using MVCBlogWebsite.Models.ViewModels;
 using MVCBlogWebsite.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MVCBlogWebsite.Models.Domain;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MVCBlogWebsite.Controllers
 {
-    public class AdminBlogPostsController : Controller
+	[Authorize(Roles = "Admin")]
+	public class AdminBlogPostsController : Controller
     {
         private readonly ITagRepository _tagRepository;
         private readonly IBlogPostRepository _blogPostRepository;
