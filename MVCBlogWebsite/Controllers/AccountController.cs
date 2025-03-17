@@ -68,13 +68,15 @@ namespace MVCBlogWebsite.Controllers
             {
                 if (string.IsNullOrWhiteSpace(loginViewModel.ReturnUrl))
                 {
-                    return Redirect(loginViewModel.ReturnUrl);
+                    // If the ReturnUrl is null or empty, redirect to the homepage
+                    return RedirectToAction("Index", "Home");
                 }
 
-                return RedirectToAction("Index", "Home"); //redirec to homepage
+                // If a valid ReturnUrl is provided, redirect to that URL
+                return Redirect(loginViewModel.ReturnUrl);
             }
 
-            //show error notification
+            // Show error notification
             return View();
         }
 

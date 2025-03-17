@@ -21,6 +21,11 @@ namespace MVCBlogWebsite.Repositories
 			return blogPostLike;
         }
 
+        public async Task<IEnumerable<BlogPostLike>> GetLikesForBlog(Guid blogPostId)
+        {
+            return await _blogDbContext.BlogPostLike.Where(x => x.BlogPostId == blogPostId).ToListAsync();
+        }
+
         public async Task<int> GetTotalLikes(Guid blogPostId)
 		{
 			//get total number of likes of specific blogpost and return the number (of likes)
