@@ -6,14 +6,14 @@ namespace MVCBlogWebsite.Controllers
 {
     public class AccountController : Controller
     {
-		private readonly UserManager<IdentityUser> _userManager;
-		private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-		public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
-			_userManager = userManager;
-			_signInManager = signInManager;
-		}
+            _userManager = userManager;
+            _signInManager = signInManager;
+        }
 
         [HttpGet]
         public IActionResult Register()
@@ -24,30 +24,35 @@ namespace MVCBlogWebsite.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
-            var identityUser = new IdentityUser
+            if (ModelState.IsValid)
             {
-                UserName = registerViewModel.Username,
-                Email = registerViewModel.Email,
-            };
 
-            var identityResult = await _userManager.CreateAsync(identityUser, registerViewModel.Password);
-
-            if (identityResult.Succeeded)
-            {
-                //assign role for newly created user
-                var roleIdentityResult = await _userManager.AddToRoleAsync(identityUser, "User");
-
-                if (roleIdentityResult.Succeeded)
+                var identityUser = new IdentityUser
                 {
-                    //show success notification
-                    return  RedirectToAction("Register");
+                    UserName = registerViewModel.Username,
+                    Email = registerViewModel.Email,
+                };
+
+                var identityResult = await _userManager.CreateAsync(identityUser, registerViewModel.Password);
+
+                if (identityResult.Succeeded)
+                {
+                    //assign role for newly created user
+                    var roleIdentityResult = await _userManager.AddToRoleAsync(identityUser, "User");
+
+                    if (roleIdentityResult.Succeeded)
+                    {
+                        //show success notification
+                        return RedirectToAction("Register");
+                    }
                 }
+
             }
 
             //show error notification
             return View();
         }
-        
+
         [HttpGet]
         public IActionResult Login(string ReturnUrl)
         {
@@ -62,6 +67,11 @@ namespace MVCBlogWebsite.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel loginViewModel)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
             var signInResult = await _signInManager.PasswordSignInAsync(loginViewModel.Username, loginViewModel.Password, false, false);
 
             if (signInResult != null && signInResult.Succeeded)

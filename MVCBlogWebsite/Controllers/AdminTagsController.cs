@@ -28,6 +28,13 @@ namespace MVCBlogWebsite.Controllers
 		[ActionName("Add")]
 		public async Task<IActionResult> Add(AddTagRequest addTagRequest)
 		{
+			ValidateAddTagRequest(addTagRequest);
+
+			if (ModelState.IsValid == false)
+			{
+				return View();
+			}
+
 			//Mapping AddTagRequest to Tag domain model
 			var tag = new Tag
 			{
@@ -42,10 +49,31 @@ namespace MVCBlogWebsite.Controllers
 
 		[HttpGet]
 		[ActionName("List")]
-		public async Task<IActionResult> List()
+		public async Task<IActionResult> List(string? searchQuery, string? sortBy, string? sortDirection, int pageSize = 3, int pageNumber = 1)
 		{
-			//use dbContext to read the tags
-			var tags = await _tagRepository.GetAllAsync();
+			var totalRecords = await _tagRepository.CountAsync();
+			var totalPages = Math.Ceiling((decimal)totalRecords / pageSize);
+
+			if (pageNumber > totalPages)
+			{
+				pageNumber--;
+			}
+
+			if (pageNumber < 1)
+			{
+				pageNumber++;
+			}
+
+			ViewBag.TotalPages = totalPages;
+
+			ViewBag.SearchQuery = searchQuery;
+			ViewBag.SortBy = sortBy;
+			ViewBag.SortDirection = sortDirection;
+			ViewBag.PageSize = pageSize;
+			ViewBag.PageNumber = pageNumber;
+
+            //use dbContext to read the tags
+            var tags = await _tagRepository.GetAllAsync(searchQuery, sortBy, sortDirection, pageNumber, pageSize);
 
 			return View(tags);
 		}
@@ -109,5 +137,15 @@ namespace MVCBlogWebsite.Controllers
 			return RedirectToAction("Edit", new { id = editTagRequest.Id });
 		}
 
+		private void ValidateAddTagRequest(AddTagRequest addTagRequest)
+		{
+			if (addTagRequest?.Name is not null && addTagRequest?.DisplayName is not null)
+			{
+				if (addTagRequest.Name == addTagRequest.DisplayName)
+				{
+					ModelState.AddModelError("DisplayName", "Name cannot be the same as DisplayName");
+				}
+			}
+		}
 	}
 }
